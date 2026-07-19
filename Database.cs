@@ -46,39 +46,69 @@ public static class Database
 
     private static void FillStartData(SqliteConnection con)
     {
-        var countCmd = con.CreateCommand();
-        countCmd.CommandText = "SELECT COUNT(*) FROM items";
-        var count = Convert.ToInt32(countCmd.ExecuteScalar());
-        if (count > 0) return;
-
-        string[] cats = ["RPG", "Екшен", "Стратегія", "Пригоди"];
+        string[] cats = ["RPG", "Екшен", "Стратегія", "Пригоди", "Шутер", "Симулятор", "Хорор", "Виживання"];
         foreach (var cat in cats)
         {
+            var check = con.CreateCommand();
+            check.CommandText = "SELECT COUNT(*) FROM categories WHERE category_name=$name";
+            check.Parameters.AddWithValue("$name", cat);
+            if (Convert.ToInt32(check.ExecuteScalar()) > 0) continue;
+
             var c = con.CreateCommand();
             c.CommandText = "INSERT INTO categories(category_name) VALUES($name)";
             c.Parameters.AddWithValue("$name", cat);
             c.ExecuteNonQuery();
         }
 
-        var games = new (string title, int year, string genre, int cat)[]
+        var games = new (string title, int year, string genre, string cat, string story)[]
         {
-            ("The Witcher 3", 2015, "RPG", 1),
-            ("Minecraft", 2011, "Пісочниця", 4),
-            ("Portal 2", 2011, "Головоломка", 4),
-            ("Half-Life 2", 2004, "Шутер", 2),
-            ("Stardew Valley", 2016, "Симулятор", 4),
-            ("Civilization VI", 2016, "Стратегія", 3),
-            ("Hades", 2020, "Roguelike", 2),
-            ("Elden Ring", 2022, "Action RPG", 1),
-            ("Terraria", 2011, "Пригоди", 4),
-            ("Cyberpunk 2077", 2020, "RPG", 1)
+            ("The Witcher 3", 2015, "RPG", "RPG", "Геральт шукає Цірі і потрапляє у велику історію з монстрами, війною та складними виборами."),
+            ("Minecraft", 2011, "Пісочниця", "Пригоди", "Гравець сам придумує пригоду: будує, виживає, шукає ресурси і може дійти до дракона Краю."),
+            ("Portal 2", 2011, "Головоломка", "Пригоди", "Челл проходить дивні випробування в лабораторії, де портали допомагають вирішувати задачі."),
+            ("Half-Life 2", 2004, "Шутер", "Шутер", "Гордон Фрімен допомагає повстанцям боротися проти Альянсу у похмурому місті."),
+            ("Stardew Valley", 2016, "Симулятор", "Симулятор", "Герой переїжджає на стару ферму і поступово робить її живою та красивою."),
+            ("Civilization VI", 2016, "Стратегія", "Стратегія", "Тут треба провести свою цивілізацію від давніх часів до майбутнього."),
+            ("Hades", 2020, "Roguelike", "Екшен", "Загрей пробує втекти з підземного світу, і кожна спроба відкриває нові діалоги."),
+            ("Elden Ring", 2022, "Action RPG", "RPG", "Гравець досліджує Міжзем'я, перемагає босів і збирає частини великої легенди."),
+            ("Terraria", 2011, "Пригоди", "Пригоди", "Спочатку є тільки герой і прості інструменти, але потім світ відкриває босів, біоми і секрети."),
+            ("Cyberpunk 2077", 2020, "RPG", "RPG", "V живе у Найт-Сіті, де імпланти, банди і корпорації постійно створюють проблеми."),
+            ("Subnautica", 2018, "Виживання", "Виживання", "Гравець падає на океанічну планету і мусить будувати базу, шукати ресурси та не стати чиїмось обідом."),
+            ("Subnautica Below Zero", 2021, "Виживання", "Виживання", "На холодній планеті героїня шукає правду про сестру і виживає серед льоду та дивних істот."),
+            ("Counter-Strike 2", 2023, "Тактичний шутер", "Шутер", "Дві команди змагаються у раундах: одні ставлять бомбу, інші мають її зупинити."),
+            ("Battlefield 2042", 2021, "Шутер", "Шутер", "У грі показані великі бої майбутнього з технікою, штормами і великими картами."),
+            ("Fortnite", 2017, "Battle Royale", "Шутер", "Гравці висаджуються на острів, збирають зброю і намагаються залишитися останніми."),
+            ("GTA V", 2013, "Екшен", "Екшен", "Три герої роблять пограбування і постійно потрапляють у проблеми в місті Лос-Сантос."),
+            ("Red Dead Redemption 2", 2018, "Пригоди", "Пригоди", "Артур Морган живе у банді на Дикому Заході, де старі правила вже зникають."),
+            ("God of War", 2018, "Екшен", "Екшен", "Кратос разом із сином Атреєм іде в небезпечну подорож по світу скандинавських міфів."),
+            ("The Last of Us Part I", 2013, "Пригоди", "Пригоди", "Джоел і Еллі проходять через небезпечний світ після епідемії і поступово стають близькими."),
+            ("Doom Eternal", 2020, "Шутер", "Шутер", "Doom Slayer дуже швидко і жорстко знищує демонів, щоб врятувати Землю."),
+            ("Resident Evil 4", 2005, "Хорор", "Хорор", "Леон шукає доньку президента у дивному селі, де майже всі поводяться дуже небезпечно."),
+            ("Hogwarts Legacy", 2023, "RPG", "RPG", "Учень Гоґвортсу вивчає магію, досліджує замок і розбирається з давньою таємницею."),
+            ("Baldur's Gate 3", 2023, "RPG", "RPG", "Герої заражені паразитом і шукають спосіб врятуватися, але дорога швидко стає набагато складнішою."),
+            ("Roblox", 2006, "Платформа ігор", "Пригоди", "Це не одна гра, а ціла платформа, де люди створюють свої режими і грають у чужі."),
+            ("Among Us", 2018, "Соціальна гра", "Пригоди", "Команда ремонтує корабель, але серед них є зрадники, які всіх обманюють."),
+            ("Valorant", 2020, "Тактичний шутер", "Шутер", "Команди б'ються у раундах, але кожен агент має ще й особливі вміння."),
+            ("Apex Legends", 2019, "Battle Royale", "Шутер", "Загони героїв висаджуються на карту і виживають, використовуючи зброю та здібності."),
+            ("League of Legends", 2009, "MOBA", "Стратегія", "Дві команди чемпіонів змагаються на одній карті і пробують зламати базу суперника."),
+            ("Dota 2", 2013, "MOBA", "Стратегія", "П'ять героїв проти п'яти поступово стають сильнішими і борються за головну споруду ворога."),
+            ("Rocket League", 2015, "Спорт", "Екшен", "Це футбол на машинах, де треба забивати м'яч, стрибати і літати по арені.")
         };
 
         int i = 1;
         foreach (var g in games)
         {
+            var exists = con.CreateCommand();
+            exists.CommandText = "SELECT COUNT(*) FROM items WHERE title=$title";
+            exists.Parameters.AddWithValue("$title", g.title);
+            if (Convert.ToInt32(exists.ExecuteScalar()) > 0)
+            {
+                i++;
+                continue;
+            }
+
             var cover = MakeCover(g.title, i);
-            var html = MakeHtml(g.title, g.year, g.genre);
+            var html = MakeHtml(g.title, g.year, g.genre, g.story);
+            int catId = GetCategoryId(con, g.cat);
 
             var cmd = con.CreateCommand();
             cmd.CommandText =
@@ -91,15 +121,23 @@ public static class Database
             cmd.Parameters.AddWithValue("$genre", g.genre);
             cmd.Parameters.AddWithValue("$cover", cover);
             cmd.Parameters.AddWithValue("$html", html);
-            cmd.Parameters.AddWithValue("$cat", g.cat);
+            cmd.Parameters.AddWithValue("$cat", catId);
             cmd.ExecuteNonQuery();
             i++;
         }
     }
 
+    private static int GetCategoryId(SqliteConnection con, string name)
+    {
+        var cmd = con.CreateCommand();
+        cmd.CommandText = "SELECT category_id FROM categories WHERE category_name=$name";
+        cmd.Parameters.AddWithValue("$name", name);
+        return Convert.ToInt32(cmd.ExecuteScalar());
+    }
+
     private static string MakeCover(string title, int number)
     {
-        string rel = Path.Combine("Assets", "covers", $"cover_{number}.png");
+        string rel = Path.Combine("Assets", "covers", $"cover_{number}_{MakeFileName(title)}.png");
         string full = Path.Combine(BaseFolder, rel);
         if (File.Exists(full)) return rel;
 
@@ -116,7 +154,7 @@ public static class Database
         return rel;
     }
 
-    private static string MakeHtml(string title, int year, string genre)
+    private static string MakeHtml(string title, int year, string genre, string story)
     {
         string rel = Path.Combine("Assets", "html", MakeFileName(title) + ".html");
         string full = Path.Combine(BaseFolder, rel);
@@ -139,7 +177,7 @@ public static class Database
             <div class="box">
                 <p><b>Рік виходу:</b> {{year}}</p>
                 <p><b>Жанр:</b> {{genre}}</p>
-                <p>Ця гра додана як приклад для практичного завдання. Тут можна написати коротку історію гри, опис світу, персонажів або цікаві факти.</p>
+                <p>{{story}}</p>
                 <p>HTML-файл лежить у папці Assets, а в базі даних зберігається тільки шлях до нього.</p>
             </div>
         </body>
