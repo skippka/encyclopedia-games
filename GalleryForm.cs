@@ -1,0 +1,105 @@
+namespace GameEncyclopedia;
+
+public class GalleryForm : Form
+{
+    private PictureBox big = new();
+    private FlowLayoutPanel strip = new();
+    private Button prev = new();
+    private Button next = new();
+    private Button slide = new();
+    private System.Windows.Forms.Timer timer = new();
+    private List<GameItem> items = [];
+    private int index = 0;
+
+    public GalleryForm()
+    {
+        Text = "Галерея обкладинок";
+        Width = 850;
+        Height = 620;
+        StartPosition = FormStartPosition.CenterParent;
+
+        big.Dock = DockStyle.Fill;
+        big.SizeMode = PictureBoxSizeMode.Zoom;
+        big.BackColor = Color.FromArgb(28, 31, 38);
+        big.DoubleClick += (_, _) => OpenCurrent();
+
+        var bottom = new Panel { Dock = DockStyle.Bottom, Height = 125 };
+        prev.Text = "<";
+        next.Text = ">";
+        slide.Text = "Слайд-шоу";
+        prev.SetBounds(10, 45, 45, 34);
+        next.SetBounds(785, 45, 45, 34);
+        slide.SetBounds(665, 45, 105, 34);
+        strip.SetBounds(65, 10, 590, 105);
+        strip.AutoScroll = false;
+        bottom.Controls.AddRange([prev, next, slide, strip]);
+
+        Controls.Add(big);
+        Controls.Add(bottom);
+
+        Load += (_, _) => { items = Database.LoadItems(); ShowItem(); };
+        prev.Click += (_, _) => MoveIndex(-1);
+        next.Click += (_, _) => MoveIndex(1);
+        slide.Click += (_, _) => timer.Enabled = !timer.Enabled;
+        timer.Interval = 1800;
+        timer.Tick += (_, _) => MoveIndex(1);
+    }
+
+    private void MoveIndex(int step)
+    {
+        if (items.Count == 0) return;
+        index += step;
+        if (index < 0) index = items.Count - 1;
+        if (index >= items.Count) index = 0;
+        ShowItem();
+    }
+
+    private void ShowItem()
+    {
+        if (items.Count == 0) return;
+        var item = items[index];
+        Text = "Галерея: " + item.Title;
+        LoadPicture(big, item.CoverPath);
+        MakeStrip();
+    }
+
+    private void MakeStrip()
+    {
+        strip.Controls.Clear();
+        int start = Math.Max(0, index - 2);
+        if (start + 5 > items.Count) start = Math.Max(0, items.Count - 5);
+
+        for (int i = start; i < Math.Min(items.Count, start + 5); i++)
+        {
+            var pic = new PictureBox();
+            pic.Width = 100;
+            pic.Height = 100;
+            pic.Margin = new Padding(6, 2, 6, 2);
+            pic.SizeMode = PictureBoxSizeMode.Zoom;
+            pic.BorderStyle = i == index ? BorderStyle.Fixed3D : BorderStyle.FixedSingle;
+            pic.Tag = i;
+            LoadPicture(pic, items[i].CoverPath);
+            pic.Click += (_, _) =>
+            {
+                index = (int)pic.Tag;
+                ShowItem();
+            };
+            pic.DoubleClick += (_, _) => OpenCurrent();
+            strip.Controls.Add(pic);
+        }
+    }
+
+    private void LoadPicture(PictureBox pic, string rel)
+    {
+        string path = Database.FullPath(rel);
+        if (!File.Exists(path)) return;
+        if (pic.Image != null) pic.Image.Dispose();
+        pic.Image = Image.FromFile(path);
+    }
+
+    private void OpenCurrent()
+    {
+        if (items.Count == 0) return;
+        new MediaForm(items[index]).ShowDialog();
+    }
+}
