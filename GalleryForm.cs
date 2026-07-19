@@ -9,7 +9,9 @@ public class GalleryForm : Form
     private Button slide = new();
     private System.Windows.Forms.Timer timer = new();
     private List<GameItem> items = [];
+    private List<string> slideImages = [];
     private int index = 0;
+    private int slideIndex = 0;
 
     public GalleryForm()
     {
@@ -37,21 +39,63 @@ public class GalleryForm : Form
         Controls.Add(big);
         Controls.Add(bottom);
 
-        Load += (_, _) => { items = Database.LoadItems(); ShowItem(); };
+        Load += (_, _) =>
+        {
+            items = Database.LoadItems();
+            LoadSlideImages();
+            ShowItem();
+        };
         prev.Click += (_, _) => MoveIndex(-1);
         next.Click += (_, _) => MoveIndex(1);
-        slide.Click += (_, _) => timer.Enabled = !timer.Enabled;
+        slide.Click += (_, _) =>
+        {
+            timer.Enabled = !timer.Enabled;
+            slide.Text = timer.Enabled ? "Стоп" : "Слайд-шоу";
+            if (timer.Enabled) ShowSlide();
+            else ShowItem();
+        };
         timer.Interval = 1800;
-        timer.Tick += (_, _) => MoveIndex(1);
+        timer.Tick += (_, _) => NextSlide();
     }
 
     private void MoveIndex(int step)
     {
         if (items.Count == 0) return;
+        timer.Enabled = false;
+        slide.Text = "Слайд-шоу";
         index += step;
         if (index < 0) index = items.Count - 1;
         if (index >= items.Count) index = 0;
         ShowItem();
+    }
+
+    private void LoadSlideImages()
+    {
+        string folder = Path.Combine(Database.BaseFolder, "Assets", "slideshow");
+        if (!Directory.Exists(folder)) return;
+        foreach (var file in Directory.GetFiles(folder, "*.png"))
+        {
+            slideImages.Add(file);
+        }
+    }
+
+    private void NextSlide()
+    {
+        if (slideImages.Count == 0)
+        {
+            MoveIndex(1);
+            return;
+        }
+        slideIndex++;
+        if (slideIndex >= slideImages.Count) slideIndex = 0;
+        ShowSlide();
+    }
+
+    private void ShowSlide()
+    {
+        if (slideImages.Count == 0) return;
+        Text = "Галерея: слайд-шоу";
+        LoadPictureFromFullPath(big, slideImages[slideIndex]);
     }
 
     private void ShowItem()
@@ -81,6 +125,8 @@ public class GalleryForm : Form
             LoadPicture(pic, items[i].CoverPath);
             pic.Click += (_, _) =>
             {
+                timer.Enabled = false;
+                slide.Text = "Слайд-шоу";
                 index = (int)pic.Tag;
                 ShowItem();
             };
@@ -93,6 +139,11 @@ public class GalleryForm : Form
     {
         string path = Database.FullPath(rel);
         if (!File.Exists(path)) return;
+        LoadPictureFromFullPath(pic, path);
+    }
+
+    private void LoadPictureFromFullPath(PictureBox pic, string path)
+    {
         if (pic.Image != null) pic.Image.Dispose();
         pic.Image = Image.FromFile(path);
     }
