@@ -12,6 +12,7 @@ public class MainForm : Form
     private Button deleteButton = new();
     private Button galleryButton = new();
     private Button mediaButton = new();
+    private Button refreshButton = new();
     private DataTable table = new();
     private DataView view = new();
 
@@ -31,12 +32,15 @@ public class MainForm : Form
         deleteButton.Text = "Видалити";
         galleryButton.Text = "Галерея";
         mediaButton.Text = "Деталі";
+        refreshButton.Text = "Оновити";
         addButton.SetBounds(420, 14, 90, 30);
         editButton.SetBounds(518, 14, 105, 30);
         deleteButton.SetBounds(631, 14, 95, 30);
         galleryButton.SetBounds(734, 14, 90, 30);
         mediaButton.SetBounds(832, 14, 90, 30);
-        top.Controls.AddRange([searchBox, categoryBox, addButton, editButton, deleteButton, galleryButton, mediaButton]);
+        refreshButton.SetBounds(12, 44, 90, 25);
+        top.Height = 75;
+        top.Controls.AddRange([searchBox, categoryBox, addButton, editButton, deleteButton, galleryButton, mediaButton, refreshButton]);
 
         grid.Dock = DockStyle.Fill;
         grid.ReadOnly = true;
@@ -55,6 +59,7 @@ public class MainForm : Form
         deleteButton.Click += (_, _) => DeleteGame();
         galleryButton.Click += (_, _) => new GalleryForm().ShowDialog();
         mediaButton.Click += (_, _) => OpenMedia();
+        refreshButton.Click += (_, _) => LoadData();
         grid.CellDoubleClick += (_, _) => OpenMedia();
         grid.CellFormatting += Grid_CellFormatting;
         FormClosing += MainForm_FormClosing;

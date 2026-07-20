@@ -42,6 +42,7 @@ public static class Database
         cmd.ExecuteNonQuery();
 
         FillStartData(con);
+        AddDemoMedia(con);
     }
 
     private static void FillStartData(SqliteConnection con)
@@ -143,6 +144,32 @@ public static class Database
         cmd.CommandText = "SELECT category_id FROM categories WHERE category_name=$name";
         cmd.Parameters.AddWithValue("$name", name);
         return Convert.ToInt32(cmd.ExecuteScalar());
+    }
+
+    private static void AddDemoMedia(SqliteConnection con)
+    {
+        var videos = new Dictionary<string, string>
+        {
+            ["Minecraft"] = Path.Combine("Assets", "media", "minecraft.avi"),
+            ["Subnautica"] = Path.Combine("Assets", "media", "subnautica.avi"),
+            ["Counter-Strike 2"] = Path.Combine("Assets", "media", "counter-strike_2.avi"),
+            ["Battlefield 2042"] = Path.Combine("Assets", "media", "battlefield_2042.avi"),
+            ["Cyberpunk 2077"] = Path.Combine("Assets", "media", "cyberpunk_2077.avi")
+        };
+
+        foreach (var v in videos)
+        {
+            var cmd = con.CreateCommand();
+            cmd.CommandText =
+            """
+            UPDATE items
+            SET media_path=$media
+            WHERE title=$title AND (media_path IS NULL OR media_path='')
+            """;
+            cmd.Parameters.AddWithValue("$media", v.Value);
+            cmd.Parameters.AddWithValue("$title", v.Key);
+            cmd.ExecuteNonQuery();
+        }
     }
 
     private static string MakeCover(string title, int number)
