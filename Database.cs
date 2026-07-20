@@ -166,20 +166,14 @@ public static class Database
         <html lang="uk">
         <head>
             <meta charset="utf-8">
-            <style>
-                body { font-family: Segoe UI, Arial; margin: 24px; background: #f7f7f7; color: #222; }
-                h1 { color: #20304a; }
-                .box { background: white; padding: 16px; border-left: 5px solid #4b75bd; }
-            </style>
+            <title>{{title}}</title>
         </head>
         <body>
             <h1>{{title}}</h1>
-            <div class="box">
-                <p><b>Рік виходу:</b> {{year}}</p>
-                <p><b>Жанр:</b> {{genre}}</p>
-                <p>Тут можна написати коротку історію гри, опис світу, персонажів або цікаві факти.</p>
-                <p>HTML-файл лежить у папці Assets, а в базі даних зберігається тільки шлях до нього.</p>
-            </div>
+            <p><b>Рік виходу:</b> {{year}}</p>
+            <p><b>Жанр:</b> {{genre}}</p>
+            <p>Тут можна написати коротку історію гри, опис світу, персонажів або цікаві факти.</p>
+            <p>HTML-файл лежить у папці Assets, а в базі даних зберігається тільки шлях до нього.</p>
         </body>
         </html>
         """);
