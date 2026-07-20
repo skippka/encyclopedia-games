@@ -41,27 +41,9 @@
 
 ## Схема бази даних
 
-```mermaid
-erDiagram
-    categories ||--o{ items : has
-
-    categories {
-        int category_id PK
-        string category_name
-    }
-
-    items {
-        int item_id PK
-        string title
-        int release_year
-        string genre
-        string cover_image_path
-        string media_path
-        string html_desc_path
-        int category_id FK
-    }
-```
+![Схема бази даних](Assets/schema_db.png)
 
 ## Примітка
 
 У базі зберігаються не самі файли, а тільки шляхи до них. Самі файли лежать у папці `Assets`.
+
