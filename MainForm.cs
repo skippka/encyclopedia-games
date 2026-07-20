@@ -74,7 +74,11 @@ public class MainForm : Form
 
     private void LoadData()
     {
-        int cat = categoryBox.SelectedValue is int x ? x : 0;
+        int cat = 0;
+        if (categoryBox.SelectedValue != null && categoryBox.SelectedValue is not DataRowView)
+        {
+            cat = Convert.ToInt32(categoryBox.SelectedValue);
+        }
         table = Database.LoadTable(cat);
         view = new DataView(table);
         grid.DataSource = view;

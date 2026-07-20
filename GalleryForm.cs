@@ -71,11 +71,24 @@ public class GalleryForm : Form
 
     private void LoadSlideImages()
     {
+        slideImages.Clear();
         string folder = Path.Combine(Database.BaseFolder, "Assets", "slideshow");
+        AddSlideFiles(folder);
+
+        string htmlImages = Path.Combine(Database.BaseFolder, "Assets", "html", "image");
+        AddSlideFiles(htmlImages);
+    }
+
+    private void AddSlideFiles(string folder)
+    {
         if (!Directory.Exists(folder)) return;
-        foreach (var file in Directory.GetFiles(folder, "*.png"))
+        foreach (var file in Directory.GetFiles(folder))
         {
-            slideImages.Add(file);
+            string ext = Path.GetExtension(file).ToLower();
+            if (ext == ".png" || ext == ".jpg" || ext == ".jpeg")
+            {
+                slideImages.Add(file);
+            }
         }
     }
 
@@ -145,7 +158,30 @@ public class GalleryForm : Form
     private void LoadPictureFromFullPath(PictureBox pic, string path)
     {
         if (pic.Image != null) pic.Image.Dispose();
-        pic.Image = Image.FromFile(path);
+        try
+        {
+            using var img = Image.FromFile(path);
+            pic.Image = MakeSmallImage(img, Math.Max(pic.Width, 900), Math.Max(pic.Height, 600));
+        }
+        catch
+        {
+            pic.Image = null;
+        }
+    }
+
+    private Image MakeSmallImage(Image img, int maxW, int maxH)
+    {
+        double k1 = (double)maxW / img.Width;
+        double k2 = (double)maxH / img.Height;
+        double k = Math.Min(1, Math.Min(k1, k2));
+        int w = Math.Max(1, (int)(img.Width * k));
+        int h = Math.Max(1, (int)(img.Height * k));
+
+        var bmp = new Bitmap(w, h);
+        using var g = Graphics.FromImage(bmp);
+        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+        g.DrawImage(img, 0, 0, w, h);
+        return bmp;
     }
 
     private void OpenCurrent()

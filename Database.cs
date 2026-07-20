@@ -91,7 +91,17 @@ public static class Database
             ("Apex Legends", 2019, "Battle Royale", "Шутер"),
             ("League of Legends", 2009, "MOBA", "Стратегія"),
             ("Dota 2", 2013, "MOBA", "Стратегія"),
-            ("Rocket League", 2015, "Спорт", "Екшен")
+            ("Rocket League", 2015, "Спорт", "Екшен"),
+            ("Helldivers 2", 2024, "Кооперативний шутер", "Шутер"),
+            ("Palworld", 2024, "Виживання", "Виживання"),
+            ("Black Myth Wukong", 2024, "Action RPG", "RPG"),
+            ("Lethal Company", 2023, "Хорор", "Хорор"),
+            ("Phasmophobia", 2020, "Хорор", "Хорор"),
+            ("Sea of Thieves", 2020, "Пригоди", "Пригоди"),
+            ("No Man's Sky", 2016, "Виживання", "Виживання"),
+            ("Euro Truck Simulator 2", 2012, "Симулятор", "Симулятор"),
+            ("War Thunder", 2013, "Екшен", "Екшен"),
+            ("Rust", 2018, "Виживання", "Виживання")
         };
 
         int i = 1;
