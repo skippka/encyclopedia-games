@@ -39,9 +39,6 @@
 - `Database.cs` - робота з SQLite.
 - `Assets` - картинки та HTML-файли.
 
-## Схема бази даних
-
-![Схема бази даних](Assets/schema_db.png)
 
 ## Примітка
 
